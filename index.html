@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baweed Groceries</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #8E44AD; /* Plum Red */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .btn {
+            background-color: #8E44AD;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #6C3483;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home">
+            <h1>Welcome to Baweed Groceries</h1>
+            <div id="products">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+            <button class="btn" onclick="showSection('add-product')">Add Product</button>
+            <button class="btn" onclick="showSection('register-customer')">Register Customer</button>
+        </div>
+
+        <!-- Product Detail Page -->
+        <div id="product-detail" class="hidden">
+            <h1 id="product-name"></h1>
+            <p>Price: £<span id="product-price"></span></p>
+            <img id="product-image" src="" alt="Product Image" class="product-image">
+            <button class="btn" onclick="showSection('place-order')">Buy Now</button>
+            <button class="btn" onclick="showSection('home')">Back to Home</button>
+        </div>
+
+        <!-- Add Product Page -->
+        <div id="add-product" class="hidden">
+            <h1>Add Product</h1>
+            <form onsubmit="addProduct(event)">
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+                <label for="price">Price:</label>
+                <input type="number" id="price" step="0.01" required>
+                <label for="image">Image:</label>
+                <input type="file" id="image" accept="image/*">
+                <button type="submit" class="btn">Save</button>
+            </form>
+            <button class="btn" onclick="showSection('home')">Back to Home</button>
+        </div>
+
+        <!-- Register Customer Page -->
+        <div id="register-customer" class="hidden">
+            <h1>Register Customer</h1>
+            <form onsubmit="registerCustomer(event)">
+                <label for="customer-name">Name:</label>
+                <input type="text" id="customer-name" required>
+                <label for="customer-email">Email:</label>
+                <input type="email" id="customer-email" required>
+                <label for="customer-password">Password:</label>
+                <input type="password" id="customer-password" required>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <button class="btn" onclick="showSection('home')">Back to Home</button>
+        </div>
+
+        <!-- Place Order Page -->
+        <div id="place-order" class="hidden">
+            <h1>Place Order</h1>
+            <form onsubmit="placeOrder(event)">
+                <label for="customer-id">Customer ID:</label>
+                <input type="number" id="customer-id" required>
+                <label for="product-id">Product ID:</label>
+                <input type="number" id="product-id" required>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" required>
+                <label for="payment-method">Payment Method:</label>
+                <select id="payment-method" required>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="debit_card">Debit Card</option>
+                    <option value="cash_on_delivery">Cash on Delivery</option>
+                </select>
+                <label for="shipping-address">Shipping Address:</label>
+                <textarea id="shipping-address" required></textarea>
+                <button type="submit" class="btn">Place Order</button>
+            </form>
+            <button class="btn" onclick="showSection('home')">Back to Home</button>
+        </div>
+
+        <!-- Order Confirmation Page -->
+        <div id="order-confirmation" class="hidden">
+            <h1>Order Confirmation</h1>
+            <p>Thank you for your order!</p>
+            <button class="btn" onclick="showSection('home')">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Load products dynamically
+        function loadProducts() {
+            fetch('/products')
+                .then(response => response.json())
+                .then(data => {
+                    const productsDiv = document.getElementById('products');
+                    productsDiv.innerHTML = '';
+                    data.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card';
+                        productCard.innerHTML = `
+                            <h2>${product.name}</h2>
+                            <p>Price: £${product.price}</p>
+                            <button class="btn" onclick="showProductDetail(${product.product_id})">View Details</button>
+                        `;
+                        productsDiv.appendChild(productCard);
+                    });
+                });
+        }
+
+        // Show product details
+        function showProductDetail(productId) {
+            fetch(`/product/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    document.getElementById('product-name').textContent = product.name;
+                    document.getElementById('product-price').textContent = product.price;
+                    document.getElementById('product-image').src = product.image;
+                    showSection('product-detail');
+                });
+        }
+
+        // Add product
+        function addProduct(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('image', document.getElementById('image').files[0]);
+
+            fetch('/add-product', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadProducts();
+                showSection('home');
+            });
+        }
+
+        // Register customer
+        function registerCustomer(event) {
+            event.preventDefault();
+            const customer = {
+                name: document.getElementById('customer-name').value,
+                email: document.getElementById('customer-email').value,
+                password: document.getElementById('customer-password').value
+            };
+
+            fetch('/register-customer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(customer)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showSection('home');
+            });
+        }
+
+        // Place order
+        function placeOrder(event) {
+            event.preventDefault();
+            const order = {
+                customer_id: document.getElementById('customer-id').value,
+                product_id: document.getElementById('product-id').value,
+                quantity: document.getElementById('quantity').value,
+                payment_method: document.getElementById('payment-method').value,
+                shipping_address: document.getElementById('shipping-address').value
+            };
+
+            fetch('/place-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                showSection('order-confirmation');
+            });
+        }
+
+        // Load products on page load
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.3.4", // For making HTTP requests
+    "framer-motion": "^10.12.4", // For animations
+    "react": "^18.2.0", // React library
+    "react-dom": "^18.2.0", // React DOM for rendering
+    "react-router-dom": "^6.8.1", // For routing
+    "tailwindcss": "^3.2.7", // Tailwind CSS for styling
+    "react-scripts": "^5.0.1", // Required for Create React App
+    "postcss": "^8.4.21", // Required for Tailwind CSS
+    "autoprefixer": "^10.4.13" // Required for Tailwind CSS
+  },
+  "scripts": {
+    "start": "react-scripts start", // Start the development server
+    "build": "react-scripts build", // Build the app for production
+    "test": "react-scripts test", // Run tests
+    "eject": "react-scripts eject", // Eject from Create React App
+    "lint": "eslint src", // Lint your code
+    "format": "prettier --write src", // Format your code
+    "tailwind:build": "tailwindcss -i ./src/input.css -o ./src/output.css --watch" // Tailwind CSS build script
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
